@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { db } from "../../../lib/firebase";
 import { doc, getDoc, collection, query, where, getDocs, limit, orderBy, onSnapshot } from "firebase/firestore";
-import StickyHeader from "../../../components/StickyHeader";
 import Footer from "../../../components/Footer";
 import VotingButtons from "../../../components/VotingButtons";
 
@@ -155,7 +154,6 @@ export default function EventPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0b0b0b]">
-        <StickyHeader />
         <div className="max-w-4xl mx-auto px-4 py-20 mt-24">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-800 rounded w-3/4"></div>
@@ -172,7 +170,6 @@ export default function EventPage() {
   if (!event) {
     return (
       <div className="min-h-screen bg-[#0b0b0b]">
-        <StickyHeader />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="text-6xl mb-4">📭</div>
@@ -186,8 +183,6 @@ export default function EventPage() {
 
   return (
     <div className="min-h-screen bg-[#0b0b0b]">
-      <StickyHeader />
-      
       <div className="max-w-4xl mx-auto px-4 py-20 mt-24">
         {/* Event Header */}
         <motion.div

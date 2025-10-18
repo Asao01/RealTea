@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { auth, db } from "../../../lib/firebase";
 import { collection, getDocs, limit, query } from "firebase/firestore";
 import env from "../../../lib/env";
-import StickyHeader from "../../../components/StickyHeader";
 import Footer from "../../../components/Footer";
 
 export default function DiagnosticsPage() {
@@ -60,8 +59,6 @@ export default function DiagnosticsPage() {
 
   return (
     <div className="min-h-screen bg-[#0b0b0b]">
-      <StickyHeader />
-      
       <div className="max-w-4xl mx-auto px-4 py-20 mt-24">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

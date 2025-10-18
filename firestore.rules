@@ -12,8 +12,8 @@ service cloud.firestore {
       // ✅ ALLOW: Create new events if verified by AI with minimum credibility
       allow create: if isValidEventWrite();
       
-      // ❌ DENY: Updates to existing events (prevent tampering)
-      allow update: if false;
+      // ✅ ALLOW: Updates from auto system (Cloud Functions) to add enriched fields
+      allow update: if isValidEventUpdate();
       
       // ❌ DENY: Deleting events (preserve history)
       allow delete: if false;
@@ -40,6 +40,23 @@ service cloud.firestore {
           
           // Must have timestamps
           data.createdAt is timestamp &&
+          data.updatedAt is timestamp
+        );
+      }
+      
+      // Validation function for event updates
+      function isValidEventUpdate() {
+        let data = request.resource.data;
+        let existingData = resource.data;
+        
+        return (
+          // Must be an auto-generated event
+          existingData.addedBy == 'auto' &&
+          
+          // Must maintain auto addedBy
+          data.addedBy == 'auto' &&
+          
+          // Update timestamp must be present
           data.updatedAt is timestamp
         );
       }

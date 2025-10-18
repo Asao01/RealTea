@@ -10,7 +10,6 @@ import { isAdmin } from "../../lib/adminAuth";
 import AdminStats from "../../components/AdminStats";
 import CategoryChart from "../../components/CategoryChart";
 import RecentActivityLog from "../../components/RecentActivityLog";
-import StickyHeader from "../../components/StickyHeader";
 import Footer from "../../components/Footer";
 
 export default function AdminPage() {
@@ -201,8 +200,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#0b0b0b]">
-      <StickyHeader />
-      
       <div className="max-w-7xl mx-auto px-4 py-20 mt-24">
         {/* Header */}
         <motion.div

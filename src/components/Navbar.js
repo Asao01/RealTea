@@ -13,7 +13,7 @@ export default function Navbar() {
   const isActive = (href) => pathname === href;
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-gray-900 border-b border-gray-800 shadow-lg">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 shadow-lg">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo - Left Side */}
@@ -41,7 +41,7 @@ export default function Navbar() {
               className={`text-sm font-medium transition-colors ${
                 isActive('/timeline') 
                   ? 'text-[#D4AF37] font-semibold' 
-                  : 'text-gray-700 hover:text-[#D4AF37]'
+                  : 'text-gray-300 hover:text-[#D4AF37]'
               }`}
             >
               Timeline
@@ -51,7 +51,7 @@ export default function Navbar() {
               className={`text-sm font-medium transition-colors ${
                 isActive('/map') 
                   ? 'text-[#D4AF37] font-semibold' 
-                  : 'text-gray-700 hover:text-[#D4AF37]'
+                  : 'text-gray-300 hover:text-[#D4AF37]'
               }`}
             >
               Map
@@ -61,7 +61,7 @@ export default function Navbar() {
               className={`text-sm font-medium transition-colors ${
                 isActive('/today') 
                   ? 'text-[#D4AF37] font-semibold' 
-                  : 'text-gray-700 hover:text-[#D4AF37]'
+                  : 'text-gray-300 hover:text-[#D4AF37]'
               }`}
             >
               Today
@@ -71,7 +71,7 @@ export default function Navbar() {
               className={`text-sm font-medium transition-colors ${
                 isActive('/transparency') 
                   ? 'text-[#D4AF37] font-semibold' 
-                  : 'text-gray-700 hover:text-[#D4AF37]'
+                  : 'text-gray-300 hover:text-[#D4AF37]'
               }`}
             >
               Transparency
@@ -81,7 +81,7 @@ export default function Navbar() {
               className={`text-sm font-medium transition-colors ${
                 isActive('/about') 
                   ? 'text-[#D4AF37] font-semibold' 
-                  : 'text-gray-700 hover:text-[#D4AF37]'
+                  : 'text-gray-300 hover:text-[#D4AF37]'
               }`}
             >
               About
@@ -128,7 +128,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-gray-900 border-t border-gray-800">
+        <div className="md:hidden bg-gray-900 border-t border-gray-800 absolute top-full left-0 right-0 z-50 shadow-2xl">
           <div className="px-6 py-4 space-y-3">
             <Link 
               href="/" 
@@ -143,7 +143,7 @@ export default function Navbar() {
               href="/timeline" 
               onClick={() => setMobileMenuOpen(false)} 
               className={`block py-2 text-sm font-medium ${
-                isActive('/timeline') ? 'text-[#D4AF37]' : 'text-gray-700'
+                isActive('/timeline') ? 'text-[#D4AF37]' : 'text-gray-300'
               }`}
             >
               Timeline
@@ -152,7 +152,7 @@ export default function Navbar() {
               href="/map" 
               onClick={() => setMobileMenuOpen(false)} 
               className={`block py-2 text-sm font-medium ${
-                isActive('/map') ? 'text-[#D4AF37]' : 'text-gray-700'
+                isActive('/map') ? 'text-[#D4AF37]' : 'text-gray-300'
               }`}
             >
               Map
@@ -161,7 +161,7 @@ export default function Navbar() {
               href="/today" 
               onClick={() => setMobileMenuOpen(false)} 
               className={`block py-2 text-sm font-medium ${
-                isActive('/today') ? 'text-[#D4AF37]' : 'text-gray-700'
+                isActive('/today') ? 'text-[#D4AF37]' : 'text-gray-300'
               }`}
             >
               Today
@@ -170,7 +170,7 @@ export default function Navbar() {
               href="/transparency" 
               onClick={() => setMobileMenuOpen(false)} 
               className={`block py-2 text-sm font-medium ${
-                isActive('/transparency') ? 'text-[#D4AF37]' : 'text-gray-700'
+                isActive('/transparency') ? 'text-[#D4AF37]' : 'text-gray-300'
               }`}
             >
               Transparency
@@ -179,7 +179,7 @@ export default function Navbar() {
               href="/about" 
               onClick={() => setMobileMenuOpen(false)} 
               className={`block py-2 text-sm font-medium ${
-                isActive('/about') ? 'text-[#D4AF37]' : 'text-gray-700'
+                isActive('/about') ? 'text-[#D4AF37]' : 'text-gray-300'
               }`}
             >
               About
