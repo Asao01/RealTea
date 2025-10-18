@@ -1,0 +1,276 @@
+[
+  {
+    "date": "-0445-01-01",
+    "title": "Construction of the Parthenon begins",
+    "description": "Construction of the Parthenon in Athens begins during the leadership of Pericles, symbolizing the height of Classical Greece.",
+    "sources": ["https://en.wikipedia.org/wiki/Parthenon"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "-0031-09-02",
+    "title": "Battle of Actium",
+    "description": "Octavian defeats Mark Antony and Cleopatra at Actium, paving the way for the Roman Empire under Augustus.",
+    "sources": ["https://en.wikipedia.org/wiki/Battle_of_Actium"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "0064-07-18",
+    "title": "Great Fire of Rome",
+    "description": "A massive fire devastates Rome; accounts later implicate Emperor Nero, though historians debate the details.",
+    "sources": ["https://en.wikipedia.org/wiki/Great_Fire_of_Rome"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "0800-12-25",
+    "title": "Charlemagne crowned Emperor",
+    "description": "Pope Leo III crowns Charlemagne as Emperor in Rome, reviving the title in Western Europe.",
+    "sources": ["https://en.wikipedia.org/wiki/Charlemagne"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1066-10-14",
+    "title": "Battle of Hastings",
+    "description": "William the Conqueror defeats Harold II, beginning the Norman conquest of England.",
+    "sources": ["https://en.wikipedia.org/wiki/Battle_of_Hastings"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1215-06-15",
+    "title": "Magna Carta sealed",
+    "description": "King John of England seals the Magna Carta at Runnymede, influencing constitutional law.",
+    "sources": ["https://en.wikipedia.org/wiki/Magna_Carta"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1492-10-12",
+    "title": "Columbus reaches the Americas",
+    "description": "Christopher Columbus lands in the Americas during his voyage sponsored by Spain.",
+    "sources": ["https://en.wikipedia.org/wiki/Christopher_Columbus"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1517-10-31",
+    "title": "Luther’s Ninety-five Theses",
+    "description": "Martin Luther publishes the Ninety-five Theses, sparking the Protestant Reformation.",
+    "sources": ["https://en.wikipedia.org/wiki/Ninety-five_Theses"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1609-01-01",
+    "title": "Kepler’s laws formulated (approx.)",
+    "description": "Johannes Kepler begins publishing his laws of planetary motion, transforming astronomy.",
+    "sources": ["https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion", "https://www.nasa.gov/"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1687-07-05",
+    "title": "Newton’s Principia published",
+    "description": "Isaac Newton publishes Philosophiæ Naturalis Principia Mathematica, laying foundations of classical mechanics.",
+    "sources": ["https://en.wikipedia.org/wiki/Philosophi%C3%A6_Naturalis_Principia_Mathematica"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1776-07-04",
+    "title": "U.S. Declaration of Independence",
+    "description": "The Thirteen Colonies declare independence from Britain, forming the United States of America.",
+    "sources": ["https://en.wikipedia.org/wiki/United_States_Declaration_of_Independence", "https://www.archives.gov/founding-docs/declaration"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1789-07-14",
+    "title": "Storming of the Bastille",
+    "description": "Revolutionaries storm the Bastille in Paris, a key event of the French Revolution.",
+    "sources": ["https://en.wikipedia.org/wiki/Storming_of_the_Bastille"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1804-12-02",
+    "title": "Napoleon crowns himself Emperor",
+    "description": "Napoleon Bonaparte crowns himself Emperor of the French at Notre-Dame Cathedral.",
+    "sources": ["https://en.wikipedia.org/wiki/Napoleon"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1863-01-01",
+    "title": "Emancipation Proclamation",
+    "description": "U.S. President Abraham Lincoln issues the Emancipation Proclamation, freeing slaves in Confederate states.",
+    "sources": ["https://www.archives.gov/exhibits/featured-documents/emancipation-proclamation"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1914-07-28",
+    "title": "World War I begins",
+    "description": "Austria-Hungary declares war on Serbia, triggering World War I.",
+    "sources": ["https://en.wikipedia.org/wiki/World_War_I"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1918-11-11",
+    "title": "Armistice ends World War I",
+    "description": "An armistice is signed, ending hostilities on the Western Front of World War I.",
+    "sources": ["https://en.wikipedia.org/wiki/Armistice_of_11_November_1918"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1939-09-01",
+    "title": "World War II begins",
+    "description": "Germany invades Poland, prompting Britain and France to declare war on Germany.",
+    "sources": ["https://en.wikipedia.org/wiki/World_War_II"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1945-10-24",
+    "title": "United Nations founded",
+    "description": "The UN is established to promote international cooperation and prevent future conflicts.",
+    "sources": ["https://www.un.org/en/about-us/history-of-the-un"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1948-12-10",
+    "title": "Universal Declaration of Human Rights",
+    "description": "The UN General Assembly adopts the UDHR, defining fundamental human rights.",
+    "sources": ["https://www.un.org/en/about-us/universal-declaration-of-human-rights"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1957-10-04",
+    "title": "Sputnik 1 launched",
+    "description": "The Soviet Union launches Sputnik 1, the first artificial Earth satellite, starting the Space Age.",
+    "sources": ["https://www.nasa.gov/historical/1957-sputnik-1/", "https://en.wikipedia.org/wiki/Sputnik_1"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1961-04-12",
+    "title": "First human in space",
+    "description": "Yuri Gagarin orbits Earth aboard Vostok 1, the first human spaceflight.",
+    "sources": ["https://www.nasa.gov/humans-in-space/yuri-gagarin/"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1969-07-20",
+    "title": "Apollo 11 Moon landing",
+    "description": "Neil Armstrong and Buzz Aldrin land on the Moon; Armstrong takes the first steps on the lunar surface.",
+    "sources": ["https://www.nasa.gov/mission_pages/apollo/apollo11.html"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1989-11-09",
+    "title": "Fall of the Berlin Wall",
+    "description": "East and West Berliners dismantle parts of the Berlin Wall, symbolizing the end of the Cold War.",
+    "sources": ["https://en.wikipedia.org/wiki/Berlin_Wall#Fall_of_the_Wall"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1991-12-26",
+    "title": "Dissolution of the Soviet Union",
+    "description": "The USSR formally dissolves, ending the Cold War and creating multiple independent states.",
+    "sources": ["https://en.wikipedia.org/wiki/Dissolution_of_the_Soviet_Union"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2001-09-11",
+    "title": "September 11 attacks",
+    "description": "Coordinated terrorist attacks in the U.S. kill nearly 3,000 people and reshape global security policy.",
+    "sources": ["https://en.wikipedia.org/wiki/September_11_attacks"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2008-09-15",
+    "title": "Lehman Brothers bankruptcy",
+    "description": "Lehman Brothers files for bankruptcy, a pivotal moment in the global financial crisis.",
+    "sources": ["https://en.wikipedia.org/wiki/Lehman_Brothers#Bankruptcy"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2014-03-08",
+    "title": "MH370 disappearance",
+    "description": "Malaysia Airlines Flight MH370 disappears en route from Kuala Lumpur to Beijing, sparking massive search efforts.",
+    "sources": ["https://en.wikipedia.org/wiki/Malaysia_Airlines_Flight_370"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2014-07-17",
+    "title": "MH17 shootdown",
+    "description": "Malaysia Airlines Flight MH17 is shot down over eastern Ukraine; investigations implicate a Buk missile system.",
+    "sources": ["https://www.reuters.com/world/europe/dutch-court-rules-mh17-trial-2022-11-17/"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2016-06-23",
+    "title": "Brexit referendum",
+    "description": "The United Kingdom votes to leave the European Union.",
+    "sources": ["https://www.reuters.com/world/uk/uk-votes-leave-eu-2016-06-24/"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2018-03-14",
+    "title": "Death of Stephen Hawking",
+    "description": "Physicist Stephen Hawking passes away, renowned for work on black holes and cosmology.",
+    "sources": ["https://en.wikipedia.org/wiki/Stephen_Hawking"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2019-12-31",
+    "title": "WHO notified of pneumonia cases in Wuhan",
+    "description": "China notifies WHO about cases of pneumonia of unknown cause in Wuhan, later identified as COVID-19.",
+    "sources": ["https://www.who.int/", "https://en.wikipedia.org/wiki/COVID-19_pandemic"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2020-03-11",
+    "title": "WHO declares COVID-19 a pandemic",
+    "description": "WHO declares the COVID-19 outbreak a global pandemic.",
+    "sources": ["https://www.who.int/director-general/speeches/detail/who-director-general-s-opening-remarks-at-the-media-briefing-on-covid-19---11-march-2020"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2020-12-11",
+    "title": "First COVID-19 vaccine EUA (U.S.)",
+    "description": "The FDA issues an Emergency Use Authorization for the Pfizer-BioNTech COVID-19 vaccine.",
+    "sources": ["https://www.fda.gov/"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "2021-02-18",
+    "title": "NASA Perseverance rover lands on Mars",
+    "description": "NASA’s Perseverance rover successfully lands in Jezero Crater to search for signs of past life.",
+    "sources": ["https://mars.nasa.gov/mars2020/"],
+    "status": "verified",
+    "author": "system"
+  }
+]
+
+

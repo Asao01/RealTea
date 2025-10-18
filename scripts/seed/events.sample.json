@@ -1,0 +1,85 @@
+[
+  {
+    "date": "-3000-01-01",
+    "title": "Early Bronze Age begins in Mesopotamia",
+    "description": "Transition to urban societies and early state formations in Mesopotamia.",
+    "sources": ["https://en.wikipedia.org/wiki/Bronze_Age"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "-2560-01-01",
+    "title": "Completion of the Great Pyramid of Giza",
+    "description": "The Great Pyramid, attributed to Pharaoh Khufu, is completed in ancient Egypt.",
+    "sources": ["https://en.wikipedia.org/wiki/Great_Pyramid_of_Giza"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "-776-07-01",
+    "title": "First recorded Ancient Olympic Games",
+    "description": "The earliest recorded Olympic Games are traditionally dated to 776 BCE in Olympia, Greece.",
+    "sources": ["https://en.wikipedia.org/wiki/Ancient_Olympic_Games"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "-44-03-15",
+    "title": "Assassination of Julius Caesar",
+    "description": "Julius Caesar is assassinated on the Ides of March in Rome, reshaping Roman politics.",
+    "sources": ["https://en.wikipedia.org/wiki/Assassination_of_Julius_Caesar"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "0069-01-01",
+    "title": "Year of the Four Emperors",
+    "description": "A chaotic year in Roman history, resulting in Vespasian establishing the Flavian dynasty.",
+    "sources": ["https://en.wikipedia.org/wiki/Year_of_the_Four_Emperors"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "0791-01-01",
+    "title": "Heian period begins in Japan",
+    "description": "The imperial capital moves to Heian-kyō (Kyoto), marking cultural flourishing.",
+    "sources": ["https://en.wikipedia.org/wiki/Heian_period"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1066-10-14",
+    "title": "Battle of Hastings",
+    "description": "Norman forces under William the Conqueror defeat the English army, transforming England.",
+    "sources": ["https://en.wikipedia.org/wiki/Battle_of_Hastings"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1215-06-15",
+    "title": "Magna Carta sealed",
+    "description": "King John of England agrees to the Magna Carta, limiting royal power and establishing legal principles.",
+    "sources": ["https://en.wikipedia.org/wiki/Magna_Carta"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1453-05-29",
+    "title": "Fall of Constantinople",
+    "description": "The Ottoman Empire captures Constantinople, ending the Byzantine Empire.",
+    "sources": ["https://en.wikipedia.org/wiki/Fall_of_Constantinople"],
+    "status": "verified",
+    "author": "system"
+  },
+  {
+    "date": "1492-10-12",
+    "title": "Columbus reaches the Americas",
+    "description": "Christopher Columbus lands in the Bahamas, initiating sustained European contact with the Americas.",
+    "sources": ["https://en.wikipedia.org/wiki/Christopher_Columbus"],
+    "status": "verified",
+    "author": "system"
+  }
+  
+  
+]
+

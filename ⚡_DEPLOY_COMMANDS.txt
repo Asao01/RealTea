@@ -1,0 +1,80 @@
+═══════════════════════════════════════════════════════════════════
+⚡ REALTEA - COPY THESE COMMANDS INTO POWERSHELL
+═══════════════════════════════════════════════════════════════════
+
+IMPORTANT: Run these commands in YOUR PowerShell terminal
+(I cannot run firebase login - it requires browser authentication)
+
+═══════════════════════════════════════════════════════════════════
+STEP 1: Navigate to project folder
+═══════════════════════════════════════════════════════════════════
+
+cd C:\Users\User\Desktop\Works\realtea-timeline
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 2: Login to Firebase (browser opens automatically)
+═══════════════════════════════════════════════════════════════════
+
+firebase login
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 3: Set OpenAI key (if not done)
+═══════════════════════════════════════════════════════════════════
+
+firebase functions:config:set openai.key="sk-YOUR-OPENAI-KEY-HERE"
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 4: Deploy backend (IMPORTANT: Use quotes in PowerShell!)
+═══════════════════════════════════════════════════════════════════
+
+firebase deploy --only "functions,firestore:rules"
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 5: Test backfill (wait 2 minutes after step 4)
+═══════════════════════════════════════════════════════════════════
+
+curl "https://us-central1-reality-3af7f.cloudfunctions.net/backfillHistory?month=10&day=17&max=5"
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 6: Verify Firestore
+═══════════════════════════════════════════════════════════════════
+
+Visit: https://console.firebase.google.com/project/reality-3af7f/firestore
+Check: events collection has 5+ documents with enriched fields
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 7: Deploy frontend
+═══════════════════════════════════════════════════════════════════
+
+npm run build
+vercel --prod
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 8: Test live site
+═══════════════════════════════════════════════════════════════════
+
+Visit your Vercel URL
+Go to /timeline
+Click events to test modal
+Verify sources clickable
+
+
+═══════════════════════════════════════════════════════════════════
+✅ DONE! Your RealTea is live!
+═══════════════════════════════════════════════════════════════════
+
+Total time: ~10 minutes
+Cost: $10-15/month
+Features: AI-powered enriched events with modal popups
+
+═══════════════════════════════════════════════════════════════════
+Made with ☕ by RealTea Team
+═══════════════════════════════════════════════════════════════════
+

@@ -1,0 +1,174 @@
+═══════════════════════════════════════════════════════════════════
+🚀 REALTEA FIREBASE DEPLOYMENT - COPY & PASTE THESE COMMANDS
+═══════════════════════════════════════════════════════════════════
+
+PROJECT: reality-3af7f (already configured in .firebaserc)
+
+═══════════════════════════════════════════════════════════════════
+STEP 1: AUTHENTICATE
+═══════════════════════════════════════════════════════════════════
+
+firebase login
+
+→ Browser opens automatically
+→ Sign in with Google
+→ Grant Firebase CLI permissions
+→ Return to terminal when done
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 2: VERIFY PROJECT
+═══════════════════════════════════════════════════════════════════
+
+firebase use reality-3af7f
+
+→ Should show: "Now using project reality-3af7f"
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 3: SET OPENAI KEY (if not done)
+═══════════════════════════════════════════════════════════════════
+
+firebase functions:config:set openai.key="sk-YOUR-OPENAI-KEY-HERE"
+
+→ Replace "sk-YOUR-OPENAI-KEY-HERE" with your actual OpenAI API key
+→ Verify: firebase functions:config:get
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 4: DEPLOY BACKEND
+═══════════════════════════════════════════════════════════════════
+
+firebase deploy --only "functions,firestore:rules"
+
+→ Deploys:
+  • Firestore security rules
+  • scheduledDailyUpdate (runs daily at 1 AM)
+  • backfillHistory (HTTP endpoint)
+  • healthCheck (status endpoint)
+→ Takes 3-5 minutes
+→ Watch for: ✔ Deploy complete!
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 5: TEST BACKFILL (wait 2 min after deployment)
+═══════════════════════════════════════════════════════════════════
+
+curl "https://us-central1-reality-3af7f.cloudfunctions.net/backfillHistory?month=10&day=17&max=5"
+
+→ Should return JSON with:
+  {
+    "success": true,
+    "stats": { "created": 5, ... }
+  }
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 6: VERIFY FIRESTORE DATA
+═══════════════════════════════════════════════════════════════════
+
+1. Open: https://console.firebase.google.com
+2. Select: reality-3af7f
+3. Go to: Firestore Database
+4. Check: events collection
+5. Verify each event has:
+   ✅ shortSummary (1-2 sentences)
+   ✅ summary (3-5 sentences)
+   ✅ background
+   ✅ keyFigures (array)
+   ✅ causes
+   ✅ outcomes
+   ✅ impact
+   ✅ sources (array of {name, url} objects)
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 7: DEPLOY FRONTEND (Choose one)
+═══════════════════════════════════════════════════════════════════
+
+OPTION A: Vercel (Recommended - Easier)
+──────────────────────────────────────────
+
+npm install -g vercel
+vercel login
+npm run build
+vercel --prod
+
+→ Follow prompts
+→ Get live URL: https://realtea-timeline.vercel.app
+
+
+OPTION B: Firebase Hosting (Alternative)
+──────────────────────────────────────────
+
+Note: Requires Next.js static export configuration
+See: FIREBASE_HOSTING_SETUP.md for details
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 8: VERIFY LIVE SITE
+═══════════════════════════════════════════════════════════════════
+
+Visit your production URL and check:
+
+✅ Timeline page loads (/timeline)
+✅ Events show short summaries (1-2 sentences)
+✅ Click event → Modal opens
+✅ Modal shows full details (background, causes, outcomes, impact)
+✅ Sources are clickable links
+✅ Dark theme consistent
+✅ No console errors
+
+
+═══════════════════════════════════════════════════════════════════
+STEP 9: CHECK SCHEDULER
+═══════════════════════════════════════════════════════════════════
+
+firebase functions:list
+
+→ Should show scheduledDailyUpdate
+→ Runs daily at 1 AM EST
+→ Check logs tomorrow: firebase functions:log --only scheduledDailyUpdate
+
+
+═══════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════
+
+Login fails:
+  → firebase login --reauth
+
+Functions fail:
+  → Check: firebase functions:config:get
+  → Verify OpenAI key is set
+
+Backfill 404:
+  → Wait 2 minutes after deployment
+  → Functions need time to initialize
+
+Build fails:
+  → Remove-Item -Recurse -Force .next
+  → npm install
+  → npm run build
+
+
+═══════════════════════════════════════════════════════════════════
+QUICK TEST URLS (after deployment)
+═══════════════════════════════════════════════════════════════════
+
+Health Check:
+https://us-central1-reality-3af7f.cloudfunctions.net/healthCheck
+
+Backfill (Oct 17):
+https://us-central1-reality-3af7f.cloudfunctions.net/backfillHistory?month=10&day=17&max=5
+
+Backfill (Oct 18):
+https://us-central1-reality-3af7f.cloudfunctions.net/backfillHistory?month=10&day=18&max=10
+
+
+═══════════════════════════════════════════════════════════════════
+TIME ESTIMATE: 12 minutes total
+═══════════════════════════════════════════════════════════════════
+
+Made with ☕ by RealTea Team
+

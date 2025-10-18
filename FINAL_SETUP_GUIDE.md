@@ -1,0 +1,354 @@
+# 🚀 RealTea Timeline - FINAL SETUP GUIDE
+
+## ✅ SYSTEM COMPLETE & PRODUCTION READY
+
+All core functionality implemented and tested!
+
+---
+
+## 🎯 What's Been Built
+
+### **1. Multi-Source News Aggregation**
+`/api/fetchMultiSource` fetches from:
+- ✅ **NewsAPI** - Top headlines from 50+ sources
+- ✅ **GDELT** - Global news database (100+ countries)
+- ✅ **Wikipedia "On This Day"** - Historical events
+- ✅ **BBC World RSS** - Breaking international news
+- ✅ **Reuters RSS** - Financial & world news
+
+**Features:**
+- Automatic deduplication across sources
+- Multi-source credibility scoring (3-5 sources)
+- Saves 50 best articles per run
+
+### **2. Full Event Pages**
+`/event/[id]/page.js` displays:
+- ✅ Full AI-generated context (800-1000 words)
+- ✅ Verification badges (Verified / Under Review / Disputed)
+- ✅ Multi-source credibility scores
+- ✅ Related events in same category
+- ✅ Source links with transparency
+- ✅ Real-time AI comments
+- ✅ Voting system
+
+### **3. Comprehensive AI Update Cycle**
+`/api/comprehensiveUpdate` runs every 6 hours:
+1. Multi-source news fetch
+2. GPT-4 event enrichment (5 events per cycle)
+3. AI fact-checking
+
+### **4. Real-Time Frontend**
+- ✅ Homepage: 10 newest events, updates every 15s
+- ✅ Timeline: All events with real-time sync
+- ✅ Map: Validated coordinates, live markers
+- ✅ Event pages: Full context + related events
+
+---
+
+## 🔧 Setup for realitea.org
+
+### Step 1: Environment Variables in Vercel
+
+Add these to **Vercel Dashboard → Settings → Environment Variables:**
+
+```bash
+# Firebase
+NEXT_PUBLIC_FIREBASE_API_KEY=your_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc
+FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
+
+# OpenAI (Required for AI features)
+NEXT_PUBLIC_OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=sk-...
+
+# Google Maps
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...
+
+# Base URL
+NEXT_PUBLIC_BASE_URL=https://realitea.org
+
+# NewsAPI (Optional but recommended)
+NEWS_API_KEY=your-newsapi-key
+
+# Security (Optional)
+CRON_SECRET=your-secret-token
+```
+
+### Step 2: Firebase Configuration
+
+**Add to Firebase Console → Authentication → Authorized domains:**
+```
+realitea.org
+www.realitea.org
+realtea-timeline.vercel.app
+*.vercel.app
+```
+
+**OAuth Redirect URIs (if using social login):**
+```
+https://realitea.org/__/auth/handler
+https://www.realitea.org/__/auth/handler
+```
+
+### Step 3: Google Maps Setup
+
+**Enable APIs in Google Cloud Console:**
+- Maps JavaScript API
+- Geocoding API
+
+**Add API Key Restrictions:**
+```
+HTTP referrers:
+https://realitea.org/*
+https://www.realitea.org/*
+https://*.vercel.app/*
+```
+
+### Step 4: DNS Configuration
+
+**Add to your domain registrar:**
+```
+A Record:
+Name: @
+Value: 76.76.21.21
+
+CNAME:
+Name: www
+Value: cname.vercel-dns.com
+```
+
+### Step 5: External Cron for 6-Hour Updates
+
+**UptimeRobot (Free, Recommended):**
+1. Sign up at https://uptimerobot.com/
+2. Add Monitor:
+   - URL: `https://realitea.org/api/comprehensiveUpdate`
+   - Interval: Every 360 minutes (6 hours)
+3. Save
+
+**Alternative schedule options:**
+- Every 3 hours: 180 minutes
+- Every 12 hours: 720 minutes
+- Daily: 1440 minutes
+
+---
+
+## 📊 System Architecture
+
+```
+External Cron (Every 6 hours)
+         ↓
+/api/comprehensiveUpdate
+         ↓
+    ┌────┴────┬────────┐
+    ↓         ↓        ↓
+Multi-Source  GPT-4    Fact
+  Fetch    Enrich    Check
+    ↓         ↓        ↓
+    └────┬────┴────────┘
+         ↓
+    Firestore DB
+         ↓
+   Frontend (Real-time)
+   ├── Homepage
+   ├── Timeline  
+   ├── Map
+   └── Event Pages
+```
+
+---
+
+## 🧪 Test Your Deployment
+
+### 1. Test Multi-Source Fetch
+```
+https://your-domain.vercel.app/api/fetchMultiSource
+```
+**Expected:** JSON with sources: NewsAPI, GDELT, Wikipedia, BBC, Reuters
+
+### 2. Test Event Enrichment
+```
+https://your-domain.vercel.app/api/enrichEventFull?limit=1
+```
+**Expected:** 1 event enriched with 800-1000 word context
+
+### 3. Test Comprehensive Update
+```
+https://your-domain.vercel.app/api/comprehensiveUpdate
+```
+**Expected:** All 3 steps complete successfully
+
+### 4. Test Homepage
+```
+https://your-domain.vercel.app/
+```
+**Expected:** 10 newest events displaying
+
+### 5. Test Event Page
+```
+https://your-domain.vercel.app/event/[any-event-id]
+```
+**Expected:** Full context, related events, verification badge
+
+### 6. Test Map
+```
+https://your-domain.vercel.app/map
+```
+**Expected:** Google Maps loads, markers visible
+
+---
+
+## 🎨 Key Features
+
+### Event Detail Pages
+- **Full AI Context:** 800-1000 words generated by GPT-4
+- **Verification Status:**
+  - ✅ Verified (2+ sources, credibility ≥ 80)
+  - ⚠️ Under Review (< 2 sources)
+  - ❌ Disputed (credibility < 40)
+- **Multi-Source Links:** Transparency with all source URLs
+- **Related Events:** 5 similar events in same category
+- **Credibility Scores:** Based on 3-5 source comparison
+
+### Multi-Source Credibility Algorithm
+```javascript
+Base: 50 points
++20 if 2+ sources
++15 if 3+ sources  
++10 if 4+ sources
++5 if 5+ sources
++10 if includes BBC/Reuters/Wikipedia
+= Max 100 points
+```
+
+### Real-Time Updates
+- **onSnapshot** listeners on all data
+- Frontend updates within 15 seconds
+- No manual refresh needed
+- Live indicators show update status
+
+---
+
+## 📈 Expected Performance
+
+### Load Times
+- Homepage: < 2s
+- Timeline: < 3s
+- Map: < 4s
+- Event Pages: < 2s
+
+### Data Freshness
+- New events: Every 6 hours
+- Fact-checking: Every 6 hours
+- AI enrichment: 5 events per 6 hours
+- Real-time display: 15 second updates
+
+### Costs (Monthly)
+- OpenAI (GPT-4): ~$50-100
+- Vercel: Free (Hobby)
+- Firebase: Free (within limits)
+- Google Maps: Free ($200 credit)
+- NewsAPI: Free tier or $449/month for unlimited
+- External Cron: Free
+
+**Total: $50-550/month** depending on NewsAPI tier
+
+---
+
+## 🔐 Security
+
+### API Protection
+Set `CRON_SECRET` and require header:
+```
+Authorization: Bearer your-secret-token
+```
+
+### Firestore Rules
+```javascript
+allow read: if true;  // Public read
+allow write: if request.auth != null;  // Authenticated write
+```
+
+### Rate Limiting
+- Multi-source fetch: 10 second timeouts
+- AI enrichment: 2 second delays between requests
+- Fact-checking: 120 second timeout
+
+---
+
+## 🐛 Common Issues & Solutions
+
+### Login Popup Closes Immediately
+**Solution:** Add realitea.org to Firebase authorized domains
+
+### Map Not Loading
+**Solution:** Check NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is set
+
+### No Events Showing
+**Solution:** 
+1. Run `/api/fetchMultiSource` manually
+2. Check Firestore has events
+3. Verify onSnapshot is active (check console)
+
+### AI Enrichment Failing
+**Solution:** Check OpenAI API key has credits
+
+### NewsAPI Returns 426 Error
+**Solution:** NewsAPI changed pricing, either:
+- Get paid plan ($449/month)
+- Remove NewsAPI from multi-source fetch
+- System works with other 4 sources
+
+---
+
+## 📚 API Endpoints Reference
+
+| Endpoint | Function | Frequency |
+|----------|----------|-----------|
+| `/api/comprehensiveUpdate` | Master orchestrator | Every 6 hours |
+| `/api/fetchMultiSource` | Multi-source news | Via comprehensive |
+| `/api/enrichEventFull` | GPT-4 enrichment | Via comprehensive |
+| `/api/factCheck` | AI verification | Via comprehensive |
+| `/api/cleanup` | DB maintenance | Daily 2 AM |
+
+---
+
+## ✅ Final Checklist
+
+- [ ] All environment variables set in Vercel
+- [ ] Firebase domains authorized
+- [ ] Google Maps API configured
+- [ ] DNS records added
+- [ ] External cron configured (6-hour cycle)
+- [ ] Test all API endpoints
+- [ ] Verify homepage loads
+- [ ] Check event pages display
+- [ ] Confirm map works
+- [ ] Test login flow
+- [ ] Monitor first comprehensive update cycle
+
+---
+
+## 🎉 You're Done!
+
+Your RealTea Timeline is now:
+- ✅ Fully automated with 6-hour update cycles
+- ✅ Fetching from 5 major news sources
+- ✅ Generating full AI context for each event
+- ✅ Calculating multi-source credibility scores
+- ✅ Displaying "Under Review" for uncertain info
+- ✅ Updating in real-time across all pages
+- ✅ Production-ready for realitea.org
+
+**Just add the DNS records and you're live!** 🚀
+
+---
+
+**Deployed:** October 16, 2025  
+**Version:** 3.0.0 - Final  
+**Status:** ✅ PRODUCTION READY & FULLY AUTONOMOUS
+

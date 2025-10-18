@@ -1,0 +1,86 @@
+═══════════════════════════════════════════════════════════════════
+⚡ REALTEA - DEPLOY IN 3 EASY STEPS
+═══════════════════════════════════════════════════════════════════
+
+EVERYTHING IS READY! Just need you to run these in PowerShell:
+
+
+STEP 1: Open PowerShell
+──────────────────────────────────────────────────────────────────
+
+Press Windows+X → Select "Windows PowerShell"
+
+Then run:
+cd C:\Users\User\Desktop\Works\realtea-timeline
+
+
+STEP 2: Login & Deploy Backend (5 minutes)
+──────────────────────────────────────────────────────────────────
+
+firebase login
+
+→ Browser opens → Sign in → Click "Allow" → Return to PowerShell
+
+Then:
+
+firebase functions:config:set openai.key="sk-YOUR-OPENAI-KEY-HERE"
+firebase deploy --only "functions,firestore:rules"
+
+→ Wait 4-5 minutes for ✔ Deploy complete!
+
+
+STEP 3: Test & Deploy Frontend (3 minutes)
+──────────────────────────────────────────────────────────────────
+
+# Test backfill (wait 2 min after Step 2)
+curl "https://us-central1-reality-3af7f.cloudfunctions.net/backfillHistory?month=10&day=17&max=5"
+
+→ Should return: {"success": true, "stats": {"created": 5, ...}}
+
+# Deploy frontend
+npm run build
+vercel --prod
+
+→ Get live URL: https://realtea-timeline.vercel.app
+
+
+═══════════════════════════════════════════════════════════════════
+✅ DONE! VERIFY IT WORKS:
+═══════════════════════════════════════════════════════════════════
+
+1. Visit: https://console.firebase.google.com
+   → Check Firestore → events collection
+   → Verify 5+ events with enriched data
+
+2. Visit: Your Vercel URL
+   → Click Timeline
+   → See short summaries
+   → Click event → Modal opens
+   → Verify sources clickable
+
+3. Check scheduler:
+   firebase functions:list
+   → Should show scheduledDailyUpdate (runs daily 1 AM)
+
+
+═══════════════════════════════════════════════════════════════════
+🎉 SUCCESS = YOU SEE:
+═══════════════════════════════════════════════════════════════════
+
+✅ 3 functions deployed
+✅ 5+ events in Firestore
+✅ Events have: shortSummary, sources[], background, etc.
+✅ Live site shows digest view
+✅ Modal opens with full details
+✅ Sources are clickable
+
+
+═══════════════════════════════════════════════════════════════════
+PROJECT: reality-3af7f
+REGION: us-central1
+TIME: 8-10 minutes
+COST: $10-15/month
+═══════════════════════════════════════════════════════════════════
+
+Made with ☕ by RealTea Team
+

@@ -1,0 +1,269 @@
+"use client";
+
+import OpenAI from "openai";
+import { db } from "./firebase";
+import { collection, addDoc, serverTimestamp, getDocs } from "firebase/firestore";
+import { factCheckEvent } from "./aiFactCheck";
+import { fetchLatestNews, isDuplicate } from "./newsAPI";
+
+// Initialize OpenAI client (lazy initialization)
+let client = null;
+
+function getOpenAIClient() {
+  if (!client) {
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+    client = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+  }
+  return client;
+}
+
+/**
+ * Generate and store AI-generated events from real-world news
+ * Creates events from latest news headlines or historical data
+ * @param {string} type - "today" for this day in history, "recent" for recent news, or "random"
+ * @param {Object} user - Current user object (for addedBy field)
+ * @returns {Promise<Array>} Array of created event IDs
+ */
+export async function generateAndStoreEvents(type = "today", user = null) {
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn("OpenAI API key not configured. Cannot generate events.");
+      return [];
+    }
+
+    // Fetch existing events to check for duplicates
+    const existingSnapshot = await getDocs(collection(db, "events"));
+    const existingEvents = existingSnapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    }));
+
+    // Try to fetch real news for "recent" type
+    let newsArticles = [];
+    if (type === "recent") {
+      newsArticles = await fetchLatestNews("world OR breaking OR politics OR science OR technology", 10);
+      console.log(`📰 Fetched ${newsArticles.length} news articles`);
+    }
+
+    // Construct prompt based on type and available news
+    const today = new Date();
+    const todayFormatted = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    
+    let promptContext = "";
+    let newsContext = "";
+    
+    if (type === "recent" && newsArticles.length > 0) {
+      // Use real news headlines to generate events
+      newsContext = "\n\nReal News Headlines:\n" + newsArticles
+        .slice(0, 5)
+        .map((article, idx) => `${idx + 1}. ${article.title}\n   ${article.description}\n   Source: ${article.source}`)
+        .join('\n\n');
+      
+      promptContext = `Based on these REAL recent news headlines, create 3-5 structured historical events that are currently happening or just happened.${newsContext}\n\nConvert these news stories into properly formatted events with exact dates, locations, and categories.`;
+    } else if (type === "today") {
+      promptContext = `Generate 3-5 notable historical events that occurred on ${todayFormatted} in different years throughout history.`;
+    } else {
+      promptContext = `Generate 3-5 important historical events from random dates in history.`;
+    }
+
+    const prompt = `${promptContext}
+
+Each event must include:
+- title: Brief, compelling title
+- date: ISO format (YYYY-MM-DD)
+- location: City, Country or Region
+- category: One of (Politics, Science, Culture, Conflict, Technology, Economy, Environment, Sports, Other)
+- description: 2-3 sentences with key facts
+- verifiedSource: A real, credible source URL (Wikipedia, news site, or educational institution)
+
+Return ONLY a valid JSON array with 3-5 events:
+[
+  {
+    "title": "Event Title",
+    "date": "YYYY-MM-DD",
+    "location": "City, Country",
+    "category": "Politics",
+    "description": "Detailed description...",
+    "verifiedSource": "https://..."
+  }
+]`;
+
+    console.log("🤖 Generating AI events...");
+
+    // Call OpenAI API with correct endpoint
+    const openai = getOpenAIClient();
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a historical events curator. Generate accurate, well-documented historical events with proper sources.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7, // Higher for creative variety
+      max_tokens: 1500,
+      response_format: { type: "json_object" }, // Ensure JSON response
+    });
+
+    const text = response.choices[0]?.message?.content;
+
+    if (!text) {
+      throw new Error("No response from AI");
+    }
+
+    // Parse the response
+    let parsedData;
+    try {
+      parsedData = JSON.parse(text);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", text);
+      throw new Error("Invalid JSON response from AI");
+    }
+
+    // The AI might return { events: [...] } or just [...]
+    const events = Array.isArray(parsedData) ? parsedData : parsedData.events || [];
+
+    if (!Array.isArray(events) || events.length === 0) {
+      throw new Error("No events generated by AI");
+    }
+
+    console.log(`📝 Generated ${events.length} events, saving to Firestore...`);
+
+    // Save each event to Firestore (with duplicate checking)
+    const createdIds = [];
+    let skippedCount = 0;
+    
+    for (const event of events) {
+      try {
+        // Check for duplicates
+        if (isDuplicate(event.title, event.date, existingEvents)) {
+          console.log(`  ⏭️  Skipped duplicate: ${event.title}`);
+          skippedCount++;
+          continue;
+        }
+
+        console.log(`  📝 Creating event: ${event.title}...`);
+        
+        // First, create the event document
+        const docRef = await addDoc(collection(db, "events"), {
+          title: event.title || "Untitled Event",
+          date: event.date || new Date().toISOString().split('T')[0],
+          location: event.location || "",
+          latitude: null, // Could be geocoded later
+          longitude: null,
+          category: event.category || "Other",
+          verifiedSource: event.verifiedSource || "",
+          description: event.description || "",
+          imageUrl: event.imageUrl || "",
+          addedBy: user?.email || "AI Generator",
+          author: user?.email || "AI Generator",
+          sources: [],
+          
+          // Initial AI fact-check fields (will be updated)
+          credibilityScore: null,
+          verifiedSummary: "AI fact-checking in progress...",
+          aiSources: [],
+          factCheckStatus: "pending",
+          factCheckedAt: null,
+          
+          // Meta fields
+          aiGenerated: true, // Mark as AI-generated
+          manuallyVerified: false,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+
+        createdIds.push(docRef.id);
+        console.log(`  ✅ Added event ID: ${docRef.id}`);
+
+        // Now fact-check the event
+        console.log(`  🔍 Fact-checking: ${event.title}...`);
+        
+        try {
+          const factCheckResult = await factCheckEvent({
+            title: event.title,
+            date: event.date,
+            description: event.description,
+            verifiedSource: event.verifiedSource,
+            category: event.category,
+          });
+
+          // Update the document with fact-check results
+          const { updateDoc, doc } = await import("firebase/firestore");
+          await updateDoc(doc(db, "events", docRef.id), {
+            credibilityScore: factCheckResult.credibilityScore,
+            verifiedSummary: factCheckResult.verifiedSummary,
+            aiSources: factCheckResult.aiSources,
+            factCheckStatus: factCheckResult.factCheckStatus,
+            factCheckedAt: factCheckResult.factCheckedAt || null,
+            factCheckError: factCheckResult.factCheckError || null,
+            updatedAt: serverTimestamp(),
+          });
+
+          console.log(`  ✅ Fact-checked: ${event.title} (Score: ${factCheckResult.credibilityScore}%)`);
+        } catch (factCheckError) {
+          console.warn(`  ⚠️ Fact-check failed for: ${event.title}`, factCheckError.message);
+          
+          // Update with failure status
+          const { updateDoc, doc } = await import("firebase/firestore");
+          await updateDoc(doc(db, "events", docRef.id), {
+            factCheckStatus: "failed",
+            factCheckError: factCheckError.message,
+            verifiedSummary: "Fact-check failed, manual verification recommended",
+            updatedAt: serverTimestamp(),
+          });
+        }
+      } catch (saveError) {
+        console.error(`  ❌ Failed to save: ${event.title}`, saveError);
+      }
+    }
+
+    console.log(`🎉 Successfully added ${createdIds.length} events! (${skippedCount} duplicates skipped)`);
+    return createdIds;
+
+  } catch (error) {
+    console.error("❌ AI auto-event generation error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Generate events for today in history
+ * @param {Object} user - Current user
+ * @returns {Promise<Array>} Created event IDs
+ */
+export async function generateTodayInHistory(user = null) {
+  return generateAndStoreEvents("today", user);
+}
+
+/**
+ * Generate recent news events
+ * @param {Object} user - Current user
+ * @returns {Promise<Array>} Created event IDs
+ */
+export async function generateRecentEvents(user = null) {
+  return generateAndStoreEvents("recent", user);
+}
+
+/**
+ * Generate random historical events
+ * @param {Object} user - Current user
+ * @returns {Promise<Array>} Created event IDs
+ */
+export async function generateRandomEvents(user = null) {
+  return generateAndStoreEvents("random", user);
+}
+

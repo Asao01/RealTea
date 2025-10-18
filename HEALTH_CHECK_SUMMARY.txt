@@ -1,0 +1,200 @@
+================================================================================
+               REALTEA SYSTEM HEALTH CHECK - FINAL SUMMARY
+                     Generated: October 16, 2025
+                   Target: https://realitea.org
+================================================================================
+
+PASS/FAIL SUMMARY TABLE
+================================================================================
+| SUBSYSTEM                  | STATUS   | KEY FINDINGS                       |
+|----------------------------|----------|------------------------------------|
+| Firestore (Read/Write)     | PASS     | 11 events, R/W working             |
+| Firebase Auth              | WARN     | Prod API key INVALID               |
+| Maps API                   | FAIL     | Missing key, page crashes          |
+| API Endpoints              | WARN     | fetchBreaking OK, History ERROR    |
+| AI Heartbeat               | FAIL     | 0/4 steps succeed (HTML!=JSON)     |
+================================================================================
+
+OVERALL STATUS: DEGRADED (1 PASS, 2 WARN, 2 FAIL)
+
+CRITICAL FIXES NEEDED (Priority Order):
+================================================================================
+1. [CRITICAL] Fix Firebase Auth API key on Vercel
+   - Issue: Users can't login! API key invalid in production
+   - Fix: Update NEXT_PUBLIC_FIREBASE_API_KEY in Vercel env vars
+   - Steps: Vercel Dashboard > Settings > Environment Variables
+   
+2. [CRITICAL] Add Google Maps API key
+   - Issue: Map page completely broken (React error #310)
+   - Fix: Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to Vercel
+   - Alternative: Use OpenStreetMap (free, no key needed)
+   
+3. [HIGH] Create Firestore composite index
+   - Issue: Some queries slow/failing
+   - Fix: Click link in browser console error to auto-create
+   - Index: events > isBreaking (asc) + createdAt (desc)
+   
+4. [HIGH] Debug /api/fetchHistory 500 error
+   - Issue: Historical events API failing
+   - Fix: Check Vercel logs, likely Firestore init issue
+   
+5. [MEDIUM] Fix AI Heartbeat internal API calls
+   - Issue: All 4 steps return HTML instead of JSON
+   - Fix: Check base URL config, add force-dynamic exports
+
+================================================================================
+
+WHAT'S WORKING WELL:
+================================================================================
+  - Homepage loading perfectly with real-time updates
+  - Firestore read/write operations solid and fast (<500ms)
+  - Event display and UI looking professional
+  - Navigation and routing smooth
+  - Real-time event updates every 15 seconds
+  - 11 events in database, 7 with geolocation coordinates
+  - Error handling graceful with helpful messages
+
+DETAILED RESULTS:
+================================================================================
+
+[TEST 1] FIRESTORE CONNECTION
+  Status: PASS (100%)
+  - Firebase config loaded (Project: reality-3af7f)
+  - Firebase SDK initialized
+  - READ: Found 11 events in collection
+  - WRITE: Test document created successfully
+  - WRITE verification: Document readable
+  - Cleanup: Test document deleted
+  - Performance: <1s response time
+  
+  ISSUE: Missing composite index warning
+  - Impact: Some queries may be slow
+  - Fix: Create index via console link
+
+[TEST 2] FIREBASE AUTH
+  Status: WARN (50%)
+  LOCAL:
+    - Auth SDK initialized: PASS
+    - Google provider configured: PASS
+    - Auth domain: reality-3af7f.firebaseapp.com: PASS
+  
+  PRODUCTION:
+    - Google Sign-In popup: FAIL
+    - Error: auth/api-key-not-valid
+    - HTTP 400 from identitytoolkit.googleapis.com
+    - Impact: USERS CANNOT LOG IN
+
+[TEST 3] MAPS API
+  Status: FAIL (0%)
+  - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: MISSING
+  - Map page (/map): CRASHES
+  - Error: React Error #310 (component suspended)
+  - Events with coordinates: 7/11 (64%)
+  - Impact: Map page completely broken
+
+[TEST 4] API ENDPOINTS
+  Status: WARN (50%)
+  
+  /api/fetchBreaking:
+    - HTTP 200 OK
+    - Response: Valid JSON
+    - Processed: 0 articles (likely API key/rate limit issue)
+    - Status: WORKING (with limitations)
+  
+  /api/fetchHistory:
+    - HTTP 500 Internal Server Error
+    - Error: Server-side failure
+    - Impact: Cannot import historical events
+    - Status: BROKEN
+
+[TEST 5] AI HEARTBEAT
+  Status: FAIL (0%)
+  - Endpoint responds in 1.22s (fast)
+  - All 4 steps fail with same error:
+    * fetchBreaking: FAIL (returns HTML, not JSON)
+    * factCheck: FAIL (returns HTML, not JSON)
+    * fetchHistory: FAIL (returns HTML, not JSON)
+    * enrichEventFull: FAIL (returns HTML, not JSON)
+  
+  Root cause: Internal API calls getting HTML error pages
+  Fix: Check base URL config, force-dynamic exports
+
+================================================================================
+
+PERFORMANCE METRICS:
+================================================================================
+Firestore Read Latency:        <500ms      [GOOD]
+Firestore Write Latency:       <200ms      [GOOD]
+Page Load Time (Home):         ~2s         [GOOD]
+Real-time Update Interval:     15s         [WORKING]
+Events in Database:            11          [LOW - need more content]
+Events with Coordinates:       7/11 (64%)  [GOOD]
+API Success Rate:              50% (1/2)   [POOR]
+Auth Success Rate (prod):      0%          [CRITICAL]
+
+================================================================================
+
+ENVIRONMENT VARIABLES STATUS:
+================================================================================
+PRESENT:
+  - NEXT_PUBLIC_FIREBASE_API_KEY (BUT INVALID IN PRODUCTION!)
+  - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+  - NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+  - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+  - NEXT_PUBLIC_FIREBASE_APP_ID
+  - HISTORY_API_KEY
+  - HISTORY_API_URL
+
+MISSING:
+  - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY (CRITICAL)
+  - FIREBASE_SERVICE_ACCOUNT (for server-side ops)
+  - NEWS_API_KEY (status unknown)
+  - OPENAI_API_KEY (status unknown)
+
+================================================================================
+
+RECOMMENDED NEXT STEPS:
+================================================================================
+TODAY:
+  1. Fix Firebase Auth API key on Vercel
+  2. Add Google Maps API key (or disable map)
+  3. Create Firestore composite index
+
+THIS WEEK:
+  4. Debug /api/fetchHistory error
+  5. Fix AI Heartbeat API calls
+  6. Add 40-50 more events to database
+
+NICE TO HAVE:
+  7. Add Firebase Admin SDK
+  8. Set up error monitoring (Sentry)
+  9. Add /api/health endpoint
+  10. Validate all API keys on startup
+
+================================================================================
+
+USEFUL LINKS:
+================================================================================
+Production Site:      https://realitea.org
+Firebase Console:     https://console.firebase.google.com/project/reality-3af7f
+Vercel Dashboard:     https://vercel.com/asao01s-projects/realtea-timeline
+Google Cloud:         https://console.cloud.google.com
+React Error #310:     https://react.dev/errors/310
+
+================================================================================
+
+CONCLUSION:
+================================================================================
+RealTea is 50% operational. Core functionality (Firestore, UI, events) works
+perfectly. Critical auth and maps features are broken. With 3-5 hours of fixes,
+system could be 100% operational.
+
+PRIORITY: Fix Firebase Auth API key immediately - this blocks all user logins!
+
+================================================================================
+Full detailed report: realtea-timeline/SYSTEM_HEALTH_REPORT.md
+Script location: realtea-timeline/scripts/systemHealthCheck.js
+Run command: node scripts/systemHealthCheck.js
+================================================================================
+

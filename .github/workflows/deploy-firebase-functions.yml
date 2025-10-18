@@ -1,0 +1,47 @@
+# Deploy Firebase Functions on changes
+name: Deploy Firebase Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'functions/**'
+      - 'firestore.rules'
+      - 'firestore.indexes.json'
+      - '.github/workflows/deploy-firebase-functions.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy_functions:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+      
+      - name: Install Functions dependencies
+        run: |
+          cd functions
+          npm ci
+      
+      - name: Deploy Firebase Functions and Rules
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase deploy --only functions,firestore:rules --token "$FIREBASE_TOKEN" --project reality-3af7f --non-interactive
+      
+      - name: List deployed functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase functions:list --token "$FIREBASE_TOKEN" --project reality-3af7f
+
