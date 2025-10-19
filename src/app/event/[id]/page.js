@@ -272,25 +272,70 @@ export default function EventPage() {
           </motion.div>
         )}
 
-        {/* Long Description Article */}
+        {/* Enriched Content - Multi-layered Display */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8 mb-6"
+          className="space-y-6 mb-6"
         >
-          <div className="prose prose-invert prose-lg max-w-none">
-            {event.longDescription && event.longDescription.length > 200 ? (
-              <div className="text-gray-200 leading-relaxed space-y-4">
-                {event.longDescription.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx} className="text-lg">{paragraph}</p>
+          {/* Summary Section */}
+          <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8">
+            <h3 className="text-xl font-bold text-[#D4AF37] mb-4">📖 Overview</h3>
+            <div className="prose prose-invert prose-lg max-w-none">
+              <p className="text-gray-200 leading-relaxed text-lg">
+                {event.summary || event.longDescription || event.description || 'No description available'}
+              </p>
+            </div>
+          </div>
+
+          {/* Background Context */}
+          {event.background && (
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8">
+              <h3 className="text-xl font-bold text-[#D4AF37] mb-4">🏛️ Historical Context</h3>
+              <p className="text-gray-300 leading-relaxed">{event.background}</p>
+            </div>
+          )}
+
+          {/* Key Figures */}
+          {event.keyFigures && event.keyFigures.length > 0 && (
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8">
+              <h3 className="text-xl font-bold text-[#D4AF37] mb-4">👥 Key Figures</h3>
+              <div className="flex flex-wrap gap-2">
+                {event.keyFigures.map((figure, idx) => (
+                  <span key={idx} className="px-4 py-2 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-gray-200 rounded-lg text-sm">
+                    {figure}
+                  </span>
                 ))}
               </div>
-            ) : (
-              <p className="text-gray-200 leading-relaxed text-lg">
-                {event.description || 'No description available'}
-              </p>
+            </div>
+          )}
+
+          {/* Two Column Layout: Causes & Outcomes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Causes */}
+            {event.causes && (
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8">
+                <h3 className="text-xl font-bold text-[#D4AF37] mb-4">🔍 Causes</h3>
+                <p className="text-gray-300 leading-relaxed">{event.causes}</p>
+              </div>
+            )}
+
+            {/* Outcomes */}
+            {event.outcomes && (
+              <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8">
+                <h3 className="text-xl font-bold text-[#D4AF37] mb-4">📊 Outcomes</h3>
+                <p className="text-gray-300 leading-relaxed">{event.outcomes}</p>
+              </div>
             )}
           </div>
+
+          {/* Impact & Significance */}
+          {event.impact && (
+            <div className="bg-gradient-to-br from-[#141414] to-[#1a1a1a] border border-gray-700 rounded-xl p-8">
+              <h3 className="text-xl font-bold text-[#D4AF37] mb-4">💫 Lasting Impact</h3>
+              <p className="text-gray-300 leading-relaxed">{event.impact}</p>
+            </div>
+          )}
 
           {/* Bias Analysis Section - from subcollection or main doc */}
           {(biasMetrics || event.biasSummary) && (
@@ -413,6 +458,47 @@ export default function EventPage() {
                     </div>
                   )}
                 </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Related Events from AI */}
+        {event.relatedEvents && event.relatedEvents.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#141414] border border-gray-700 rounded-xl p-6 mb-6"
+          >
+            <h3 className="text-lg font-bold text-[#D4AF37] mb-4">🔗 Related Historical Events</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Discover other events connected to this moment in history
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {event.relatedEvents.map((related, idx) => (
+                <Link key={idx} href={`/event/${related.id}`}>
+                  <motion.div
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 hover:border-[#D4AF37] transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-semibold text-gray-200 text-sm line-clamp-2 group-hover:text-[#D4AF37] transition-colors">
+                        {related.title}
+                      </h4>
+                      <svg className="w-4 h-4 text-gray-500 group-hover:text-[#D4AF37] transition-colors flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">{related.year}</span>
+                      {related.category && (
+                        <span className="px-2 py-0.5 bg-[#D4AF37]/10 text-[#D4AF37] rounded text-xs">
+                          {related.category}
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
           </motion.div>

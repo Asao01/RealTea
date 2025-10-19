@@ -21,7 +21,7 @@ export default function StickyHeader() {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/timeline", label: "Timeline" },
-    { href: "/map", label: "Map" },
+    { href: "/today", label: "Today" },
     { href: "/transparency", label: "Transparency" },
   ];
 

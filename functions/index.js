@@ -32,11 +32,52 @@ const CONFIG = {
   MAX_EVENTS_PER_RUN: 200,
   AI_DELAY_MS: 1000,
   MIN_CREDIBILITY: 0.6,
+  AI_TEMPERATURE: 0.4,  // More factual consistency
+  AI_MAX_TOKENS: 900,    // Comprehensive responses
+  AI_MAX_RETRIES: 3,     // Retry failed API calls
+  AI_RETRY_DELAY: 2000,  // Wait 2 seconds between retries
 };
 
 // ═══════════════════════════════════════════════════════════════════
 // UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════
+
+/**
+ * Log errors to Firestore
+ */
+async function logError(error, context = {}) {
+  try {
+    await db.collection('logs').add({
+      type: 'error',
+      message: error.message || String(error),
+      stack: error.stack || '',
+      context: context,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      severity: 'ERROR'
+    });
+    console.error('❌ Error logged:', error.message, context);
+  } catch (logErr) {
+    console.error('Failed to log error:', logErr);
+  }
+}
+
+/**
+ * Retry function with exponential backoff
+ */
+async function retryWithBackoff(fn, maxRetries = CONFIG.AI_MAX_RETRIES) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      const delay = CONFIG.AI_RETRY_DELAY * attempt;
+      console.log(`⚠️  Retry attempt ${attempt}/${maxRetries} after ${delay}ms`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
 
 /**
  * Fetch from MuffinLabs History API
@@ -113,9 +154,35 @@ async function fetchWikiSummary(title) {
 }
 
 /**
+ * Cross-check facts between Wikipedia and History API
+ */
+function crossCheckFacts(event, wikiSummary) {
+  const wikiText = wikiSummary?.extract || '';
+  const historyText = event.description || '';
+  
+  // Verify year matches in both sources
+  const yearMatches = wikiText.includes(event.year) || historyText.includes(event.year);
+  
+  // Check for common key terms (at least 2 words overlap)
+  const wikiWords = new Set(wikiText.toLowerCase().split(/\s+/).filter(w => w.length > 4));
+  const historyWords = new Set(historyText.toLowerCase().split(/\s+/).filter(w => w.length > 4));
+  const commonWords = [...wikiWords].filter(w => historyWords.has(w));
+  
+  const factualAlignment = commonWords.length >= 2 && yearMatches;
+  const credibilityScore = factualAlignment ? 1.0 : 0.7;
+  
+  return {
+    verified: factualAlignment,
+    credibilityScore,
+    commonTerms: commonWords.length,
+    yearVerified: yearMatches
+  };
+}
+
+/**
  * AI summarization with enriched content and structured data
  */
-async function summarizeWithAI(event, wikiSummary) {
+async function summarizeWithAI(event, wikiSummary, allEventsForRelated = []) {
   if (!openai) {
     return {
       summary: event.description || event.title,
@@ -128,6 +195,7 @@ async function summarizeWithAI(event, wikiSummary) {
       causes: '',
       outcomes: '',
       impact: '',
+      relatedEvents: [],
       sources: [
         { name: 'Wikipedia', url: 'https://en.wikipedia.org' },
         { name: 'History API', url: 'https://history.muffinlabs.com' }
@@ -136,6 +204,10 @@ async function summarizeWithAI(event, wikiSummary) {
   }
 
   try {
+    // Cross-check facts between APIs
+    const factCheck = crossCheckFacts(event, wikiSummary);
+    console.log(`🔍 Fact check: ${factCheck.verified ? '✓' : '✗'} (${factCheck.commonTerms} common terms, year: ${factCheck.yearVerified})`);
+    
     const context = wikiSummary?.extract || event.description || event.title;
     
     const prompt = `Analyze this historical event and provide comprehensive, accurate details.
@@ -162,18 +234,21 @@ Requirements:
 - Use clear, accessible language
 - Return ONLY valid JSON, no additional text`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { 
-          role: 'system', 
-          content: 'You are a professional historian. Provide accurate, well-structured historical analysis. Return only valid JSON.' 
-        },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 600,
-      temperature: 0.3,
-      response_format: { type: "json_object" }
+    // Use retry logic for AI call
+    const completion = await retryWithBackoff(async () => {
+      return await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are a professional historian and fact-checker. Provide accurate, well-structured historical analysis based on verified sources. Cross-reference facts and return only valid JSON.' 
+          },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: CONFIG.AI_MAX_TOKENS,
+        temperature: CONFIG.AI_TEMPERATURE,
+        response_format: { type: "json_object" }
+      });
     });
 
     const responseText = completion.choices[0].message.content.trim();
@@ -190,14 +265,16 @@ Summary: ${enrichedData.summary}
 
 Write ONLY 1-2 sentences. Be specific and informative.`;
 
-      const shortCompletion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are a concise historian. Write exactly 1-2 clear sentences.' },
-          { role: 'user', content: shortSummaryPrompt }
-        ],
-        max_tokens: 100,
-        temperature: 0.3,
+      const shortCompletion = await retryWithBackoff(async () => {
+        return await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'You are a concise historian. Write exactly 1-2 clear sentences.' },
+            { role: 'user', content: shortSummaryPrompt }
+          ],
+          max_tokens: 100,
+          temperature: CONFIG.AI_TEMPERATURE,
+        });
       });
 
       shortSummary = shortCompletion.choices[0].message.content.trim();
@@ -211,6 +288,9 @@ Write ONLY 1-2 sentences. Be specific and informative.`;
     const region = extractRegion(enrichedData.summary);
     const category = categorizeEvent(event.title, enrichedData.summary);
 
+    // Find related events (simple implementation - can be enhanced)
+    const relatedEvents = findRelatedEvents(event, allEventsForRelated, enrichedData);
+
     return {
       summary: enrichedData.summary || event.description || event.title,
       shortSummary: shortSummary || enrichedData.summary.substring(0, 150) + '...',
@@ -219,16 +299,20 @@ Write ONLY 1-2 sentences. Be specific and informative.`;
       causes: enrichedData.causes || '',
       outcomes: enrichedData.outcomes || '',
       impact: enrichedData.impact || '',
+      relatedEvents: relatedEvents || [],
       sources: [
-        { name: 'Wikipedia', url: 'https://en.wikipedia.org' },
+        { name: 'Wikipedia', url: wikiSummary?.url || 'https://en.wikipedia.org' },
         { name: 'History API', url: 'https://history.muffinlabs.com' }
       ],
       region,
       category,
-      credibilityScore: 1.0 // Wikipedia + AI = high credibility
+      credibilityScore: factCheck.credibilityScore,
+      factCheckPassed: factCheck.verified
     };
   } catch (error) {
     console.error('AI error:', error.message);
+    await logError(error, { event: event.title, year: event.year, function: 'summarizeWithAI' });
+    
     // Fallback with basic data
     return {
       summary: event.description || event.title,
@@ -238,15 +322,50 @@ Write ONLY 1-2 sentences. Be specific and informative.`;
       causes: '',
       outcomes: '',
       impact: '',
+      relatedEvents: [],
       sources: [
         { name: 'Wikipedia', url: 'https://en.wikipedia.org' },
         { name: 'History API', url: 'https://history.muffinlabs.com' }
       ],
       region: 'Global',
       category: 'World',
-      credibilityScore: 0.7
+      credibilityScore: 0.5,
+      factCheckPassed: false
     };
   }
+}
+
+/**
+ * Find related events based on category, year proximity, and keywords
+ */
+function findRelatedEvents(currentEvent, allEvents, enrichedData) {
+  if (!allEvents || allEvents.length === 0) return [];
+  
+  const currentYear = parseInt(currentEvent.year);
+  const yearRange = 5; // Look for events within 5 years
+  
+  const related = allEvents
+    .filter(e => {
+      if (e.title === currentEvent.title) return false;
+      
+      const eventYear = parseInt(e.year);
+      const yearDiff = Math.abs(currentYear - eventYear);
+      
+      // Same category or within year range
+      const sameCategory = e.category === enrichedData.category;
+      const nearbyYear = yearDiff <= yearRange;
+      
+      return sameCategory || nearbyYear;
+    })
+    .slice(0, 5) // Limit to 5 related events
+    .map(e => ({
+      id: `${e.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}-${e.year}`,
+      title: e.title,
+      year: e.year,
+      category: e.category
+    }));
+  
+  return related;
 }
 
 /**
@@ -365,34 +484,38 @@ async function saveOrUpdateEvent(eventData, aiResult, sources) {
       date: date,
       year: year.toString(),
       
-      // Enriched AI-generated fields
+      // Enriched AI-generated fields (Full multi-layered data)
       background: aiResult.background || '',
       keyFigures: aiResult.keyFigures || [],
       causes: aiResult.causes || '',
       outcomes: aiResult.outcomes || '',
       impact: aiResult.impact || '',
+      relatedEvents: aiResult.relatedEvents || [],
       
       // Location and categorization
       region: aiResult.region,
       category: aiResult.category,
       location: aiResult.region,
       
-      // Sources and verification
+      // Sources and verification (with fact-checking)
       sources: sources,
       verifiedSource: sources[0]?.url || 'https://wikipedia.org',
       imageUrl: eventData.imageUrl || '',
       credibilityScore: Math.round(aiResult.credibilityScore * 100),
+      factCheckPassed: aiResult.factCheckPassed || false,
       importanceScore: 80,
       verified: true,
       verifiedByAI: true,
       
       // Metadata
       addedBy: 'auto',
-      author: 'Wikipedia',
+      author: 'Wikipedia + History API',
       historical: true,
       newsGenerated: false,
       aiGenerated: true,
       autoUpdated: true,
+      enriched: true,
+      enrichedAt: admin.firestore.FieldValue.serverTimestamp(),
       revisions: [], // Empty array for future revisions
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),

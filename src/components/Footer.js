@@ -36,8 +36,8 @@ export default function Footer() {
               {[
                 { href: "/", label: "Home" },
                 { href: "/timeline", label: "Timeline" },
-                { href: "/map", label: "World Map" },
                 { href: "/today", label: "Today in History" },
+                { href: "/transparency", label: "Transparency" },
                 { href: "/submit", label: "Submit Event" },
               ].map((link) => (
                 <Link
